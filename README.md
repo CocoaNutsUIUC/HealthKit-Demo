@@ -1,6 +1,6 @@
 # HealthKit Demo
 
-This is a CocoaNuts demo developed by [sstevenshang](https://github.com/sstevenshang).
+This is a [CocoaNuts](https://sites.google.com/site/cocoanutsios/home) demo developed by [sstevenshang](https://github.com/sstevenshang).
 
 ## HealthKit Overview
 
