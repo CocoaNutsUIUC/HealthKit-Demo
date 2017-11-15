@@ -18,6 +18,6 @@ With some hardwares, HealthKit also allow you to directly save data from the dev
 
 ### Part II: Calculating BMI
 
-### Part III: Calculating Average Steps *(Optional)*
+### Part III: Calculating Average Activities
 
 ### Part IV: Recording Workouts *(Optional)*
