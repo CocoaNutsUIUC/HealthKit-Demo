@@ -14,11 +14,10 @@ Note that HealthKit also allow you to directly work with some hardware devices. 
 
 ## CocoaHealth: a Demo App
 
-In this demo, we'll use HealthKit to create the following three functionalities:
+In this demo, we'll use HealthKit to create the following two functionalities:
 
 1) Reading user's height, weight, and monthly steps/distance/flights from `HealthStore`
-2) Writing user's body mass index to `HealthStore`
-3) Recording workouts and saving them to `HealthStore`
+2) Writing user's height, weight, and body mass index to `HealthStore`
 
 ### Part I: Interfacing with HealthKit API
 
@@ -28,6 +27,4 @@ import HealthKit
 
 ### Part II: Calculating BMI
 
-### Part III: Calculating Average Activities
-
-### Part IV: Recording Workouts *(Optional)*
+### Part III: Calculating Average Activities *(Optional)*
