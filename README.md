@@ -22,6 +22,10 @@ In this demo, we'll use HealthKit to create the following three functionalities:
 
 ### Part I: Interfacing with HealthKit API
 
+```swift
+import HealthKit
+```
+
 ### Part II: Calculating BMI
 
 ### Part III: Calculating Average Activities
