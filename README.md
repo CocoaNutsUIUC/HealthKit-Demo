@@ -1,5 +1,7 @@
 # HealthKit Demo
 
+This is a CocoaNuts demo developed by [sstevenshang](https://github.com/sstevenshang).
+
 ## HealthKit Overview
 
 [HealthKit](https://developer.apple.com/documentation/healthkit), what is it?
