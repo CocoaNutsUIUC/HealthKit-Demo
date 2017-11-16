@@ -468,6 +468,7 @@ The time has come! Let's fill in those `didSet` observers of our private varaibl
 
 Also, don't forget to add `updateUI()` to the end of our `readWeightAndHeight()` function, so that once we've fetched user's data from `HealthStore` we can display them to the user:
 
+``` swift
     private func readWeightAndHeight() {
     
         ...
@@ -479,7 +480,39 @@ Also, don't forget to add `updateUI()` to the end of our `readWeightAndHeight()`
         }
         updateUI()
     }
+```
 
-#### 8. 
+#### 8. Subclass `UITextFieldDelegate` and implement `textFieldShouldReturn()`
+
+You may notice that once the keyboard has poped up, it never goes away! This is a problem, and we solve it by making our class the delegate of both of our TextFields.
+
+Add the following code at the very bottom of the `ViewController.swift` file:
+
+``` swift
+extension ViewController: UITextFieldDelegate {
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+}
+```
+
+- This tells the textField that once "*return*" is pressed, it should resign the keyboard.
+
+Don't forget to also actually set the delegates! Update `viewDidLoad()` with the following code:
+
+``` swift
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        askForHealthKitAccess()
+        weightTextField.delegate = self // todo
+        heightTextField.delegate = self // todo
+    }
+```
+
+Good job!
+
+Now run your app in a simulator or on your iPhone!
 
 ### Part III: Calculating Average Activities *(Optional)*
