@@ -53,17 +53,97 @@ Apple cares a lot about user's privacy. Getting the user's permissions to access
 
 Open `info.plist` and add the following keys: (If you scroll down in the dropbox, you'll be able to find them.)
 
-- Privacy – Health Share Usage Description
-- Privacy – Health Update Usage Description
+- **Privacy – Health Share Usage Description**
+- **Privacy – Health Update Usage Description**
 
 And under the value section of each keys, put: 
-- "The app needs assess to your health information."
+- **"The app needs assess to your health information."**
 
 Note that if these two keys are not set, the app will crash on launch when it's trying to authorize HealthKit.
 
 #### 2. Create the new class `HealthKitController`
 
 Think back to the principles of Model-View-Controller, we'll create a class called `HealthKitController` that handles all businesses that has to do with HealthKit's API so that when we work on other stuff, this layer of abstraction is nice and clear.
+
+- Create a new file named "*HealthKitController.swift*", make it a subclass of `NSObject`.
+- Import `HealthKit` at the top of the file.
+- Create a singleton named `sharedInstance` since we will only need one instance of this class per user. A [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) is just an object that is initiated exactly once and persists on a global scope.
+
+Code:
+
+``` swift
+import UIKit
+import HealthKit
+
+class HealthKitController: NSObject {
+    
+    // Singleton
+    static let sharedInstance = HealthKitController()
+}
+```
+
+Then, let's start working on the authorization process.
+
+#### 3. Create a `HealthKitControllerError` Enum and a `HKHealthStore` instance
+
+Add the folowing piece of code to your `HealthKitController` class:
+
+``` swift
+    private enum HealthKitControllerError: Error {
+        case DeviceNotSupported
+        case DataTypeNotAvailable
+    }
+    
+    private let healthStore = HKHealthStore()
+```
+
+The enum will be useful later when we're trying to figure out what kind of error our app is encountering. The `healthStore` varaible an instance of `HKHealthStore`, which is the database through which we'll store and query our data.
+
+#### 4. Create the function `authorizeHealthKit()`
+
+This is the function that will ask the user to authorize access to his or her data. Add the below function to our `HealthKitController` class:
+
+``` swift
+    func authorizeHealthKit(completion: @escaping (Bool, Error?) -> Void) {
+        
+        guard HKHealthStore.isHealthDataAvailable() else {
+            completion(false, HealthKitControllerError.DeviceNotSupported)
+            return
+        }
+        
+        guard let weight = HKObjectType.quantityType(forIdentifier: .bodyMass),
+            let height = HKObjectType.quantityType(forIdentifier: .height),
+            let bodyMassIndex = HKObjectType.quantityType(forIdentifier: .bodyMassIndex),
+            let stepCount = HKObjectType.quantityType(forIdentifier: .stepCount),
+            let distance = HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning),
+            let flightCount = HKObjectType.quantityType(forIdentifier: .flightsClimbed) else {
+                completion(false, HealthKitControllerError.DataTypeNotAvailable)
+                return
+        }
+        
+        let dataToWrite: Set<HKSampleType> = [weight,
+                                              height,
+                                              bodyMassIndex]
+        
+        let dataToRead: Set<HKSampleType> = [weight,
+                                             height,
+                                             stepCount,
+                                             distance,
+                                             flightCount]
+        
+        healthStore.requestAuthorization(toShare: dataToWrite, read: dataToRead) { (success, error) in
+            completion(success, error)
+        }
+    }
+```
+
+Woo! What a big function, but don't be scared. It's just a piece of code that tells `healthStore` which data we need to read from and which data we want to write to. Let me explain it line by line:
+
+- First, the function takes in a `completion` handler, which is called before exiting the function. This is called a closure, which is really just a function pointer. We use it to inform whichever class that'll be calling `authorizeHealthKit()` whether or not the authorization has successed and what kind of error we've encountered.
+- The first `guard` statement is to check whether HealthKit is available at all on your device! Why would it not be available? Well, if you're on an iPad.
+- The second super big `guard` statement is to make sure that the data types we want to access actually exist. Your app should always know what type of data it'll be dealing with!
+- Then, we created two hash sets HKSampleType `dataToWrite` and `dataToRead` which store information about which kind of data we'll write to and read from respectively.
+- Finally, we call on `healthStore.requestAuthorization()` to actually ask the user for authorization.
 
 ### Part II: Calculating BMI
 
