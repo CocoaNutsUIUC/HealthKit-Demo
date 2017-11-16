@@ -25,7 +25,9 @@ The app, once finished, will look something like this:
 It has two main functionalities:
 
 1) *Read user's height and weight from `HealthStore` or have user input it, calculate his or her body mass index, and store them back into `HealthStore`.*
-2) *Read user's steps, walking distance, and flights climbed during the past month, then calculate his or her daily average activities.*
+2) *Read user's steps, walking distance, and flights climbed during the past month, then calculate his or her daily average activities. (optional challenge)*
+
+Note that, since **part 1** and **part 2** will cover most of what you need to know about HealthKit, **part 3** is an optional challenge. If you have time, I encourage you to try it out! It's fun and you'll get to practice the skills you just learned.
 
 ### Getting Started
 
@@ -196,7 +198,7 @@ Finally, we want a function that writes data back into `HealthStore`. The functi
 - We first create a `HKQuantitySample` object from our data `sampleQuantity` which is of the type `quantityType`.
 - Then simply call `healthStore.save()` to save the data, and we handle the result in the main thread with our `completion` handler. Wala! That's it.
 
-#### Create the function `askForHealthKitAccess` in `ViewController`
+#### 7. Create the function `askForHealthKitAccess` in `ViewController`
 
 Lastly, let's go to "*ViewController.swift*" (you should notice all the IBOutlets and IBActions that are already in the class), and put the following function in our `ViewController` class:
 
@@ -235,6 +237,249 @@ Then, last-lastly, let's call the function `askForHealthKitAccess()` in `viewDid
 ```
 ### Part II: Calculating BMI
 
-Now that we've created a robust HealthKit interface, let's start working on the actually getting user's weight and height data and calculating his or her BMI (body mass index).
+Now that we've created a robust custom interface for HealthKit, let's start working on actually getting user's weight and height data and calculating his or her BMI (body mass index).
+
+Let's start by creating a few private varaibles to store the user data we'll fetch.
+
+#### 1. Import `HealthKit` and Create varaibles `weight`, `height`, and `bodyMassIndex`
+
+Add this to the top of our `ViewController.swift` file:
+
+``` swift 
+import HealthKit
+```
+
+Add the following code to our `ViewController` class:
+
+``` swift
+    private var weight: Double? = nil {
+        didSet {
+        // for later
+        }
+    }
+    
+    private var height: Double? = nil {
+        didSet {
+        // for later
+        }
+    }
+    
+    private var bodyMassIndex: Double? = nil {
+        didSet {
+        // for alter
+        }
+    }
+```
+- In case you are not familar with `didSet`, it's what's called an observer. It will be run everytime the varaible is set, which we will implement later.
+
+#### 2. Create the function `readWeightAndHeight`
+
+We'll write a function that read user's weight and height using the functions we've created in part 1. Add the following code to your `ViewController` class:
+
+``` swift
+    private func readWeightAndHeight() {
+        
+        guard let heightType = HKSampleType.quantityType(forIdentifier: .height),
+              let weightType = HKSampleType.quantityType(forIdentifier: .bodyMass) else {
+            print("Something horrible has happened.")
+            return
+        }
+        HealthKitController.sharedInstance.readMostRecentSample(for: heightType) { (sample, error) in
+            if let sample = sample {
+                self.height = sample.quantity.doubleValue(for: HKUnit.foot())
+            }
+        }
+        HealthKitController.sharedInstance.readMostRecentSample(for: weightType) { (sample, error) in
+            if let sample = sample {
+                self.weight = sample.quantity.doubleValue(for: HKUnit.pound())
+            }
+        }
+    }
+```
+
+- Here, we first make two `HKSampleType` objects indicating the type of data we want to read. The first `guard` statement should never fail.
+- Then, we use our own function `readMostRecentSample()` to read the most recent data point for each of the two types. Note that in the completion handlers, we extract the numerical quantity from the result samples and store them in the varaibles we just created.
+
+#### 3. Create the function `saveUserData`
+
+This is the function that saves user's inputed weight and height, and his or her computed BMI into `HealthStore`
+
+Put the following code in your `ViewController` class. It's a big function, but don't worry:
+
+``` swift
+    private func saveUserData() {
+        
+        // Prepare Data
+        guard let weight = weight,
+              let height = height,
+              let bodyMassIndex = bodyMassIndex else {
+            return
+        }
+        guard let weightType = HKQuantityType.quantityType(forIdentifier: .bodyMass),
+              let heightType = HKQuantityType.quantityType(forIdentifier: .height),
+              let bodyMassIndexType = HKQuantityType.quantityType(forIdentifier: .bodyMassIndex) else {
+            print("Something terrible has happened.")
+            return
+        }
+        
+        let weightQuantity = HKQuantity(unit: HKUnit.pound(), doubleValue: weight)
+        let heightQuantity = HKQuantity(unit: HKUnit.foot(), doubleValue: height)
+        let bodyMassIndexQuantity = HKQuantity(unit: HKUnit.count(), doubleValue: bodyMassIndex)
+        
+        // Save Data
+        var errorOccured = false
+        HealthKitController.sharedInstance.writeSample(for: weightType, sampleQuantity: weightQuantity) { (sucess, error) in
+            if !sucess, let error = error {
+                errorOccured = true
+                print(error.localizedDescription)
+            }
+        }
+        HealthKitController.sharedInstance.writeSample(for: heightType, sampleQuantity: heightQuantity) { (sucess, error) in
+            if !sucess, let error = error {
+                errorOccured = true
+                print(error.localizedDescription)
+            }
+        }
+        HealthKitController.sharedInstance.writeSample(for: bodyMassIndexType, sampleQuantity: bodyMassIndexQuantity) { (sucess, error) in
+            if !sucess, let error = error {
+                errorOccured = true
+                print(error.localizedDescription)
+            }
+        }
+        
+        // Error Handling
+        if errorOccured {
+            showAlert(title: "Failed to Save Data", message: "Some error occured while writing to HealthKit.")
+        } else {
+            showAlert(title: "Success!", message: "Successfully saved your data to HealthKit.")
+        }
+    }
+```
+
+- Inside this function, the first thing we do is check that we actually have the values that we want to store.
+- Then we prepare three `HKQuantity` objects, `weightQuantity`, `heightQuantity`, and `bodyMassIndexQuantity`, which we will save to `HealthStore`.
+- Because we're saving three different values and each saving operation has its own completion handler, we create the local flag `errorOccured` to keep track of whether or not any of the saving operations has failed.
+- Finally, we use our `writeSample()` function to save the three values, update the flag `errorOccured`, and inform the user of the result of our saving operations at the end of the function.
+
+#### 4. Implement IBActions
+
+Now that we have the appropriate values and functions, let's update our IBActions:
+
+``` swift
+    @IBAction func weightTextFieldEdited(_ sender: Any) {
+        guard let newText = weightTextField.text, let newWeight = Double(newText) else {
+            return
+        }
+        weight = newWeight
+    }
+    
+    @IBAction func heightTextFieldEdited(_ sender: Any) {
+        guard let newText = heightTextField.text, let newHeight = Double(newText) else {
+            return
+        }
+        height = newHeight
+    }
+    
+    @IBAction func saveButtonPressed(_ sender: Any) {
+        saveUserData()
+    }
+```
+- Say, if HealthKit does not have user's weight and height data, or that the user wants to update his or her information,   `weightTextFieldEdited` and `heightTextFieldEdited` will be called when the respective textField has been edited. And we want to update our varaibles to hold the user's new input values.
+- Naturally, we want to call our `saveUserData()` function when the save button is pressed.
+
+#### 5. Update `askForHealthKitAccess()`
+
+Let's call `readWeightAndHeight()` in that `else` clause in the `askForHealthKitAccess()` function so that right after authorization, we begin loading the data. Update the following code:
+
+```
+    private func askForHealthKitAccess() {
+        
+        HealthKitController.sharedInstance.authorizeHealthKit { (sucess, error) in
+            if !sucess, let error = error {
+                self.showAlert(title: "HealthKit Authentication Failed", message: error.localizedDescription)
+            } else {
+                self.readWeightAndHeight()
+            }
+        }
+    }
+```
+#### 6. Create the functions `updateUI()` and `CalculateBMI()`
+
+Let's add some useful helper functions that help us update UI and calculate BMI:
+
+``` swift
+   private func updateUI() {
+        
+        DispatchQueue.main.async {
+            if let weight = self.weight {
+                self.weightTextField.text = String(weight)
+            }
+            if let height = self.height {
+                self.heightTextField.text = String(height)
+            }
+            if let bodyMassIndex = self.bodyMassIndex {
+                self.bodyMassIndexLabel.text = String(bodyMassIndex)
+            } else {
+                self.bodyMassIndexLabel.text = "Unknown"
+            }
+        }
+    }
+    
+    private func CalculateBMI() {
+        // BMI = weight / height^2
+        
+        guard let weight = weight, let height = height, height > 0 else {
+            return
+        }
+        let weightInKiloG = Measurement(value: weight, unit: UnitMass.pounds).converted(to: UnitMass.kilograms).value
+        let heightInMeter = Measurement(value: height, unit: UnitLength.feet).converted(to: UnitLength.meters).value
+        bodyMassIndex = weightInKiloG/(heightInMeter * heightInMeter)
+    }
+```
+
+- In `updateUI()`, we check whether or not we've obtained the values we want and update the UI accordingly. Note that this must be explicitly done in the main thread, since it's possible to be called from any thread.
+- In `CalculateBMI`, we simply do some unit conversion and calculate the BMI value.
+
+#### 7. Update `didSet` and `readWeightAndHeight`
+
+The time has come! Let's fill in those `didSet` observers of our private varaibles:
+
+``` swift
+    private var weight: Double? = nil {
+        didSet {
+            CalculateBMI()
+        }
+    }
+    
+    private var height: Double? = nil {
+        didSet {
+            CalculateBMI()
+        }
+    }
+    
+    private var bodyMassIndex: Double? = nil {
+        didSet {
+            updateUI()
+        }
+    }
+```
+
+- Now, everytime the `weight` or `height` is set, we recalculate `bodyMassIndex`. And everytime `bodyMassIndex` is set, we update the UI to display it to the user.
+
+Also, don't forget to add `updateUI()` to the end of our `readWeightAndHeight()` function, so that once we've fetched user's data from `HealthStore` we can display them to the user:
+
+    private func readWeightAndHeight() {
+    
+        ...
+        ...    
+        HealthKitController.sharedInstance.readMostRecentSample(for: weightType) { (sample, error) in
+            if let sample = sample {
+                self.weight = sample.quantity.doubleValue(for: HKUnit.pound())
+            }
+        }
+        updateUI()
+    }
+
+#### 8. 
 
 ### Part III: Calculating Average Activities *(Optional)*
