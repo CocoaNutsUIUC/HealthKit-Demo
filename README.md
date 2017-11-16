@@ -145,6 +145,96 @@ Woo! What a big function, but don't be scared. It's just a piece of code that te
 - Then, we created two hash sets HKSampleType `dataToWrite` and `dataToRead` which store information about which kind of data we'll write to and read from respectively.
 - Finally, we call on `healthStore.requestAuthorization()` to actually ask the user for authorization.
 
+#### 5. Create the function `readMostRecentSample`
+
+Next, we want to write a function that will query the most up-to-date data point of one data type from `HealthStore`. We'll use it later to query the user's most recent weight and height. 
+
+Add the following function to our `HealthKitController` class:
+
+``` swift
+    func readMostRecentSample(for type: HKSampleType, completion: @escaping (HKQuantitySample?, Error?) -> Void) {
+        
+        let predicate = HKQuery.predicateForSamples(withStart: Date.distantPast, end: Date(), options: .strictEndDate)
+        let mostRecentSortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
+        let sampleQuery = HKSampleQuery(sampleType: type, predicate: predicate, limit: 1, sortDescriptors: [mostRecentSortDescriptor]) { (query, result, error) in
+            
+            DispatchQueue.main.async {
+                guard let samples = result as? [HKQuantitySample], let sample = samples.first else {
+                    completion(nil, error)
+                    return
+                }
+                completion(sample, nil)
+            }
+        }
+        
+        healthStore.execute(sampleQuery)
+    }
+```
+
+- Here, because our function should be generic, we will take in the arguments `type`, which specifies which the data type we want to query, and `completion`, which returns the query result and any error back to the function-caller.
+- If you've ever used `CoreData`, you'll find that a `HealthStore` query is remarkably similar to a `NSFetchedRequest`. 
+- We first need to create a `predicate` specifying the time interval from which we want to query our data, then we create a `NSSortDescriptor` that specify how we want our data to be sorted, which in this case is by descending `startDate`.
+- We then create the `HKSampleQuery`. Note that in among the arguments, we set `limit` to 1. This is because we only need one data point. Inside its completion closure, notice that we wrapped everything in `DispatchQueue.main.async`. This is because HealthKit functions asynchronously and we want the result to be handled in the main thread so that UI can be responsive.
+- Finally, we simply call `healthStore.execute()` to actually excute the query.
+
+#### 6. Create the function `writeSample`
+
+Finally, we want a function that writes data back into `HealthStore`. The function is also generic, so we can use it to store any type of data. Add the below function to our `HealthKitController` class:
+
+``` swift
+    func writeSample(for quantityType: HKQuantityType, sampleQuantity: HKQuantity, completion: @escaping (Bool, Error?) -> Void) {
+        
+        let sample = HKQuantitySample(type: quantityType, quantity: sampleQuantity, start: Date(), end: Date())
+        healthStore.save(sample) { (sucess, error) in
+            DispatchQueue.main.async {
+                completion(sucess, error)
+            }
+        }
+    }
+```
+
+- We first create a `HKQuantitySample` object from our data `sampleQuantity` which is of the type `quantityType`.
+- Then simply call `healthStore.save()` to save the data, and we handle the result in the main thread with our `completion` handler. Wala! That's it.
+
+#### Create the function `askForHealthKitAccess` in `ViewController`
+
+Lastly, let's go to "*ViewController.swift*" (you should notice all the IBOutlets and IBActions that are already in the class), and put the following function in our `ViewController` class:
+
+``` swift
+    private func askForHealthKitAccess() {
+        
+        HealthKitController.sharedInstance.authorizeHealthKit { (sucess, error) in
+            if !sucess, let error = error {
+                self.showAlert(title: "HealthKit Authentication Failed", message: error.localizedDescription)
+            } else {
+                // for later
+            }
+        }
+    }
+        
+    private func showAlert(title: String, message: String) {
+            
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+        alertController.addAction(okAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+```
+
+- In `askForHealthKitAccess()`, we call the function `authorizeHealthKit()` that we created in step 4, and we handle its error by showing an alert.
+- In `showAlert`, we simply create an `UIAlertController` and inform the user of a message.
+
+Then, last-lastly, let's call the function `askForHealthKitAccess()` in `viewDidLoad()` of our `ViewController` class:
+
+``` swift
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view, typically from a nib.
+        askForHealthKitAccess()
+    }
+```
 ### Part II: Calculating BMI
+
+Now that we've created a robust HealthKit interface, let's start working on the actually getting user's weight and height data and calculating his or her BMI (body mass index).
 
 ### Part III: Calculating Average Activities *(Optional)*
