@@ -8,7 +8,7 @@ This is a [CocoaNuts](https://sites.google.com/site/cocoanutsios/home) demo deve
 
 <img src="https://cdn.macrumors.com/article-new/2014/09/healthkit-logo.png" width="200"/>
 
-It is a simple framework for managing health-related data across apps on iPhone and Apple Watch. If you are developing a health & fitness app, HealthKit allows you to accesss, store, and share various types of user data like weight, blood pressure, steps, or workout informations in an encrpted database called `HealthStore`.
+It is a simple framework for managing health-related data across apps on iPhone and Apple Watch. If you are developing a health & fitness app, HealthKit allows you to access, store, and share various types of user data like weight, blood pressure, steps, or workout informations in an encrypted database called `HealthStore`.
 
 Note that HealthKit also allow you to directly work with some hardware devices. For example, "*in iOS 8.0, the system can automatically save data from compatible Bluetooth LE heart rate monitors.*" (from Apple)
 
@@ -27,11 +27,11 @@ It has two main functionalities:
 1) *Read user's height and weight from `HealthStore` or have user input it, calculate his or her body mass index, and store them back into `HealthStore`.*
 2) *Read user's steps, walking distance, and flights climbed during the past month, then calculate his or her daily average activities. (optional challenge)*
 
-Note that, since **part 1** and **part 2** will cover most of what you need to know about HealthKit, **part 3** is an optional challenge. If you have time, I encourage you to try it out! It's fun and you'll get to practice the skills you just learned.
+Note that, since **part 1** and **part 2** will cover most of what you need to know about HealthKit, **part 3** is an optional challenge. If you have time, I encourage you to try it out! It's fun, and you'll get to practice the skills you just learned.
 
 ### Getting Started
 
-To avoid wasting too much time on UI/storyboard setup, I've prepared a starter project for you. In it, I've set up the minimal UI elements in stoyboard and connected them to IBOutlets and IBActions. So unless you *want* to tweak the design, you don't need to touch `Main.storyboard` once during this entire tutorial.
+To avoid wasting too much time on UI/storyboard setup, I've prepared a starter project for you. In it, I've set up the minimal UI elements in storyboard and connected them to IBOutlets and IBActions. So unless you *want* to tweak the design, you don't need to touch `Main.storyboard` once during this entire tutorial.
 
 To get started, download the starter project in this repository by clicking on "*Clone or download*" on the top of the page and then "*Download ZIP*".
 
@@ -88,7 +88,7 @@ Then, let's start working on the authorization process.
 
 #### 3. Create a `HealthKitControllerError` Enum and a `HKHealthStore` instance
 
-Add the folowing piece of code to your `HealthKitController` class:
+Add the following piece of code to your `HealthKitController` class:
 
 ``` swift
     private enum HealthKitControllerError: Error {
@@ -99,7 +99,7 @@ Add the folowing piece of code to your `HealthKitController` class:
     private let healthStore = HKHealthStore()
 ```
 
-The enum will be useful later when we're trying to figure out what kind of error our app is encountering. The `healthStore` varaible an instance of `HKHealthStore`, which is the database through which we'll store and query our data.
+The enum will be useful later when we're trying to figure out what kind of error our app is encountering. The `healthStore` variable an instance of `HKHealthStore`, which is the database through which we'll store and query our data.
 
 #### 4. Create the function `authorizeHealthKit()`
 
@@ -141,7 +141,7 @@ This is the function that will ask the user to authorize access to his or her da
 
 Woo! What a big function, but don't be scared. It's just a piece of code that tells `healthStore` which data we need to read from and which data we want to write to. Let me explain it line by line:
 
-- First, the function takes in a `completion` handler, which is called before exiting the function. This is called a closure, which is really just a function pointer. We use it to inform whichever class that'll be calling `authorizeHealthKit()` whether or not the authorization has successed and what kind of error we've encountered.
+- First, the function takes in a `completion` handler, which is called before exiting the function. This is called a closure, which is really just a function pointer. We use it to inform whichever class that'll be calling `authorizeHealthKit()` whether or not the authorization has succeeded and what kind of error we've encountered.
 - The first `guard` statement is to check whether HealthKit is available at all on your device! Why would it not be available? Well, if you're on an iPad.
 - The second super big `guard` statement is to make sure that the data types we want to access actually exist. Your app should always know what type of data it'll be dealing with!
 - Then, we created two hash sets HKSampleType `dataToWrite` and `dataToRead` which store information about which kind of data we'll write to and read from respectively.
@@ -177,7 +177,7 @@ Add the following function to our `HealthKitController` class:
 - If you've ever used `CoreData`, you'll find that a `HealthStore` query is remarkably similar to a `NSFetchedRequest`. 
 - We first need to create a `predicate` specifying the time interval from which we want to query our data, then we create a `NSSortDescriptor` that specify how we want our data to be sorted, which in this case is by descending `startDate`.
 - We then create the `HKSampleQuery`. Note that in among the arguments, we set `limit` to 1. This is because we only need one data point. Inside its completion closure, notice that we wrapped everything in `DispatchQueue.main.async`. This is because HealthKit functions asynchronously and we want the result to be handled in the main thread so that UI can be responsive.
-- Finally, we simply call `healthStore.execute()` to actually excute the query.
+- Finally, we simply call `healthStore.execute()` to actually execute the query.
 
 #### 6. Create the function `writeSample`
 
@@ -187,16 +187,16 @@ Finally, we want a function that writes data back into `HealthStore`. The functi
     func writeSample(for quantityType: HKQuantityType, sampleQuantity: HKQuantity, completion: @escaping (Bool, Error?) -> Void) {
         
         let sample = HKQuantitySample(type: quantityType, quantity: sampleQuantity, start: Date(), end: Date())
-        healthStore.save(sample) { (sucess, error) in
+        healthStore.save(sample) { (success, error) in
             DispatchQueue.main.async {
-                completion(sucess, error)
+                completion(success, error)
             }
         }
     }
 ```
 
 - We first create a `HKQuantitySample` object from our data `sampleQuantity` which is of the type `quantityType`.
-- Then simply call `healthStore.save()` to save the data, and we handle the result in the main thread with our `completion` handler. Wala! That's it.
+- Then simply call `healthStore.save()` to save the data, and we handle the result in the main thread with our `completion` handler. That's all it is.
 
 #### 7. Create the function `askForHealthKitAccess` in `ViewController`
 
@@ -205,8 +205,8 @@ Lastly, let's go to "*ViewController.swift*" (you should notice all the IBOutlet
 ``` swift
     private func askForHealthKitAccess() {
         
-        HealthKitController.sharedInstance.authorizeHealthKit { (sucess, error) in
-            if !sucess, let error = error {
+        HealthKitController.sharedInstance.authorizeHealthKit { (success, error) in
+            if !success, let error = error {
                 self.showAlert(title: "HealthKit Authentication Failed", message: error.localizedDescription)
             } else {
                 // for later
@@ -239,9 +239,9 @@ Then, last-lastly, let's call the function `askForHealthKitAccess()` in `viewDid
 
 Now that we've created a robust custom interface for HealthKit, let's start working on actually getting user's weight and height data and calculating his or her BMI (body mass index).
 
-Let's start by creating a few private varaibles to store the user data we'll fetch.
+Let's start by creating a few private variables to store the user data we'll fetch.
 
-#### 1. Import `HealthKit` and Create varaibles `weight`, `height`, and `bodyMassIndex`
+#### 1. Import `HealthKit` and Create variables `weight`, `height`, and `bodyMassIndex`
 
 Add this to the top of our `ViewController.swift` file:
 
@@ -270,7 +270,7 @@ Add the following code to our `ViewController` class:
         }
     }
 ```
-- In case you are not familar with `didSet`, it's what's called an observer. It will be run everytime the varaible is set, which we will implement later.
+- In case you are not familiar with `didSet`, it's what's called an observer. It will be run every time the variable is set, which we will implement later.
 
 #### 2. Create the function `readWeightAndHeight`
 
@@ -298,7 +298,7 @@ We'll write a function that read user's weight and height using the functions we
 ```
 
 - Here, we first make two `HKSampleType` objects indicating the type of data we want to read. The first `guard` statement should never fail.
-- Then, we use our own function `readMostRecentSample()` to read the most recent data point for each of the two types. Note that in the completion handlers, we extract the numerical quantity from the result samples and store them in the varaibles we just created.
+- Then, we use our own function `readMostRecentSample()` to read the most recent data point for each of the two types. Note that in the completion handlers, we extract the numerical quantity from the result samples and store them in the variables we just created.
 
 #### 3. Create the function `saveUserData`
 
@@ -327,29 +327,29 @@ Put the following code in your `ViewController` class. It's a big function, but 
         let bodyMassIndexQuantity = HKQuantity(unit: HKUnit.count(), doubleValue: bodyMassIndex)
         
         // Save Data
-        var errorOccured = false
-        HealthKitController.sharedInstance.writeSample(for: weightType, sampleQuantity: weightQuantity) { (sucess, error) in
-            if !sucess, let error = error {
-                errorOccured = true
+        var errorOccurred = false
+        HealthKitController.sharedInstance.writeSample(for: weightType, sampleQuantity: weightQuantity) { (success, error) in
+            if !success, let error = error {
+                errorOccurred = true
                 print(error.localizedDescription)
             }
         }
-        HealthKitController.sharedInstance.writeSample(for: heightType, sampleQuantity: heightQuantity) { (sucess, error) in
-            if !sucess, let error = error {
-                errorOccured = true
+        HealthKitController.sharedInstance.writeSample(for: heightType, sampleQuantity: heightQuantity) { (success, error) in
+            if !success, let error = error {
+                errorOccurred = true
                 print(error.localizedDescription)
             }
         }
-        HealthKitController.sharedInstance.writeSample(for: bodyMassIndexType, sampleQuantity: bodyMassIndexQuantity) { (sucess, error) in
-            if !sucess, let error = error {
-                errorOccured = true
+        HealthKitController.sharedInstance.writeSample(for: bodyMassIndexType, sampleQuantity: bodyMassIndexQuantity) { (success, error) in
+            if !success, let error = error {
+                errorOccurred = true
                 print(error.localizedDescription)
             }
         }
         
         // Error Handling
-        if errorOccured {
-            showAlert(title: "Failed to Save Data", message: "Some error occured while writing to HealthKit.")
+        if errorOccurred {
+            showAlert(title: "Failed to Save Data", message: "Some error occurred while writing to HealthKit.")
         } else {
             showAlert(title: "Success!", message: "Successfully saved your data to HealthKit.")
         }
@@ -358,8 +358,8 @@ Put the following code in your `ViewController` class. It's a big function, but 
 
 - Inside this function, the first thing we do is check that we actually have the values that we want to store.
 - Then we prepare three `HKQuantity` objects, `weightQuantity`, `heightQuantity`, and `bodyMassIndexQuantity`, which we will save to `HealthStore`.
-- Because we're saving three different values and each saving operation has its own completion handler, we create the local flag `errorOccured` to keep track of whether or not any of the saving operations has failed.
-- Finally, we use our `writeSample()` function to save the three values, update the flag `errorOccured`, and inform the user of the result of our saving operations at the end of the function.
+- Because we're saving three different values and each saving operation has its own completion handler, we create the local flag `errorOccurred` to keep track of whether or not any of the saving operations has failed.
+- Finally, we use our `writeSample()` function to save the three values, update the flag `errorOccurred`, and inform the user of the result of our saving operations at the end of the function.
 
 #### 4. Implement IBActions
 
@@ -384,7 +384,7 @@ Now that we have the appropriate values and functions, let's update our IBAction
         saveUserData()
     }
 ```
-- Say, if HealthKit does not have user's weight and height data, or that the user wants to update his or her information,   `weightTextFieldEdited` and `heightTextFieldEdited` will be called when the respective textField has been edited. And we want to update our varaibles to hold the user's new input values.
+- Say, if HealthKit does not have user's weight and height data, or that the user wants to update his or her information,   `weightTextFieldEdited` and `heightTextFieldEdited` will be called when the respective textField has been edited. And we want to update our variables to hold the user's new input values.
 - Naturally, we want to call our `saveUserData()` function when the save button is pressed.
 
 #### 5. Update `askForHealthKitAccess()`
@@ -394,8 +394,8 @@ Let's call `readWeightAndHeight()` in that `else` clause in the `askForHealthKit
 ``` swift
     private func askForHealthKitAccess() {
         
-        HealthKitController.sharedInstance.authorizeHealthKit { (sucess, error) in
-            if !sucess, let error = error {
+        HealthKitController.sharedInstance.authorizeHealthKit { (success, error) in
+            if !success, let error = error {
                 self.showAlert(title: "HealthKit Authentication Failed", message: error.localizedDescription)
             } else {
                 self.readWeightAndHeight()
@@ -442,7 +442,7 @@ Let's add some useful helper functions that help us update UI and calculate BMI:
 
 #### 7. Update `didSet` and `readWeightAndHeight`
 
-The time has come! Let's fill in those `didSet` observers of our private varaibles:
+The time has come! Let's fill in those `didSet` observers of our private variables:
 
 ``` swift
     private var weight: Double? = nil {
@@ -464,7 +464,7 @@ The time has come! Let's fill in those `didSet` observers of our private varaibl
     }
 ```
 
-- Now, everytime the `weight` or `height` is set, we recalculate `bodyMassIndex`. And everytime `bodyMassIndex` is set, we update the UI to display it to the user.
+- Now, every time the `weight` or `height` is set, we recalculate `bodyMassIndex`. And every time `bodyMassIndex` is set, we update the UI to display it to the user.
 
 Don't forget to also add `updateUI()` to the end of our `readWeightAndHeight()` function, so that once we've fetched user's data from `HealthStore` we can display them to the user:
 
@@ -484,7 +484,7 @@ Don't forget to also add `updateUI()` to the end of our `readWeightAndHeight()` 
 
 #### 8. Subclass `UITextFieldDelegate` and implement `textFieldShouldReturn()`
 
-You may notice that once the keyboard has poped up, it never goes away! This is a problem, and we solve it by making our class the delegate of both of our TextFields.
+You may notice that once the keyboard has popped up, it never goes away! This is a problem, and we solve it by making our class the delegate of both of our TextFields.
 
 Add the following code at the very bottom of the `ViewController.swift` file:
 
@@ -517,13 +517,15 @@ Now run your app in a simulator or on your iPhone. If you see a "*Health Access*
 
 ### Part III: Calculating Average Activities *(Optional Challenge)*
 
-In this part, we will attempt to read a month of user data of the types `stepCount`, `distanceWalkingRunning`, and `flightsClimbed` from `dataStore`. Then we will calculate the user's daily average steps, daily average distance (in miles), and daily average flights, and update the UI to display their values.
+In this part, we will read three types of user data, walking/running distance, and flights climbed, during the entire past month from `HealthStore`. Then we will calculate the user's daily average steps, daily average distance (in miles), and daily average flights, and update the UI to display their values.
 
-Try to do this by yourself first, then look at my solution below:
+Try to do this by yourself first! Then, once you've made a fair attempt, take a look at the solution below:
 
 #### 1. Create the function `readPastMonthSamples()` in `HealthKitController`
 
-Since we're querying a collection of data points over a long interval of time, we can no longer use our `readMostRecentSample()` function. Add the following codes to our `HealthKitController` class:
+Since we're querying a collection of data points over a long interval of time, we can no longer use our `readMostRecentSample()` function. 
+
+Add the following codes to our `HealthKitController` class:
 
 ``` swift
     func readPastMonthSamples(for type: HKSampleType, completion: @escaping ([HKQuantitySample]?, Error?) -> Void) {
@@ -553,9 +555,9 @@ Since we're querying a collection of data points over a long interval of time, w
 
 - How is this different from the previous function for querying a single data point? Try to spot the differences!
 
-#### 2. Create varaibles `averageSteps`, `averageDistance`, `averageFlights` and Update `updateUI()`
+#### 2. Create Variables `averageSteps`, `averageDistance`, `averageFlights` and Update `updateUI()`
 
-Add the following code:
+Add the following code to our `HealthKitController` class:
 
 ``` swift
     private var averageSteps: Int? {
@@ -576,8 +578,6 @@ Add the following code:
         }
     }
 ```
-
-- Similar to our other varaibles, everytime they're set, we update the UI accordingly.
 
 Don't forget to also update our UpdateUI() function to set the labels:
 
@@ -600,7 +600,7 @@ Don't forget to also update our UpdateUI() function to set the labels:
             if let averageFlights = self.averageFlights {
                 self.averageFlightsLabel.text = String(averageFlights)
             } else {
-                self.averageFlightsLabel.text = "Unknwon"
+                self.averageFlightsLabel.text = "Unknown"
             }
         }
     }
@@ -608,7 +608,7 @@ Don't forget to also update our UpdateUI() function to set the labels:
 
 #### 3. Create the function `readActivitiesData()`
 
-And of course, we'll need a function to read the datas and compute their averages. Add the following function:
+And of course, we'll need a function to read the actual data and compute their averages. Add the following function to our `HealthKitController` class:
 
 ``` swift
     private func readActivitiesData() {
@@ -650,15 +650,15 @@ And of course, we'll need a function to read the datas and compute their average
     }
 ```
 
-- This function is pretty similar to our `readWeightAndHeight()` function. The main difference is that in each completion handler, we take the collection of data points, `samples`, and apply map-reduce to compute its average.
+- This function is pretty similar to `readWeightAndHeight()`. The main difference is that in each completion handler, we take the collection of data points (`samples`) and apply map-reduce to compute its average.
 
-Lastly, don't forget to actually call this function! Update `askForHealthKitAccess()` to add `readActivitiesData()` to the `else` clause:
+Lastly, don't forget to actually call the function! Update `askForHealthKitAccess()` to add `readActivitiesData()` to the `else` clause:
 
 ``` swift
     private func askForHealthKitAccess() {
         
-        HealthKitController.sharedInstance.authorizeHealthKit { (sucess, error) in
-            if !sucess, let error = error {
+        HealthKitController.sharedInstance.authorizeHealthKit { (success, error) in
+            if !success, let error = error {
                 self.showAlert(title: "HealthKit Authentication Failed", message: error.localizedDescription)
             } else {
                 self.readWeightAndHeight()
@@ -668,7 +668,11 @@ Lastly, don't forget to actually call this function! Update `askForHealthKitAcce
     }
 ```
 
-And that's it! You've finished the whole tutorial. Congratulations, you are now an semi-expert in HealthKit.
+---
+
+And that's it! You've finished the whole tutorial. Congratulations, you are now a semi-expert in HealthKit. 
+
+You're welcome to check out the completed version of the project in the branch `complete_project`.
 
 ---
 
