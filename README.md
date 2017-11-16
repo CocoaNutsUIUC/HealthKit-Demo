@@ -608,9 +608,7 @@ Don't forget to also update our UpdateUI() function to set the labels:
 
 #### 3. Create the function `readActivitiesData()`
 
-And of course, we'll need a function to read the actual data and compute their averages.
-
-Add the following function to our `HealthKitController` class:
+And of course, we'll need a function to read the actual data and compute their averages. Add the following function to our `HealthKitController` class:
 
 ``` swift
     private func readActivitiesData() {
@@ -654,9 +652,7 @@ Add the following function to our `HealthKitController` class:
 
 - This function is pretty similar to `readWeightAndHeight()`. The main difference is that in each completion handler, we take the collection of data points (`samples`) and apply map-reduce to compute its average.
 
-Lastly, don't forget to actually call the function! 
-
-Update `askForHealthKitAccess()` to add `readActivitiesData()` to the `else` clause:
+Lastly, don't forget to actually call the function! Update `askForHealthKitAccess()` to add `readActivitiesData()` to the `else` clause:
 
 ``` swift
     private func askForHealthKitAccess() {
@@ -674,7 +670,7 @@ Update `askForHealthKitAccess()` to add `readActivitiesData()` to the `else` cla
 
 ---
 
-And that's it! You've finished the whole tutorial. Congratulations, you are now a semi-expert in HealthKit.
+And that's it! You've finished the whole tutorial. Congratulations, you are now a semi-expert in HealthKit. 
 
 You're welcome to check out the completed version of the project in the branch `complete_project`.
 
