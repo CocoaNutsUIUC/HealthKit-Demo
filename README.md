@@ -516,3 +516,160 @@ Good job!
 Now run your app in a simulator or on your iPhone. If you see a "*Health Access*" page pop up, click on "*Turn All Categories On*" and then "*Allow*". Walala. You've created a functional app with HealthKit support! Play around with it and once you feel ready, try out part 3!
 
 ### Part III: Calculating Average Activities *(Optional Challenge)*
+
+In this part, we will attempt to read a month of user data of the types `stepCount`, `distanceWalkingRunning`, and `flightsClimbed` from `dataStore`. Then we will calculate the user's daily average steps, daily average distance (in miles), and daily average flights, and update the UI to display their values.
+
+Try to do this by yourself first, then look at my solution below:
+
+#### 1. Create the function `readPastMonthSamples()` in `HealthKitController`
+
+Since we're querying a collection of data points over a long interval of time, we can no longer use our `readMostRecentSample()` function. Add the following codes to our `HealthKitController` class:
+
+``` swift
+    func readPastMonthSamples(for type: HKSampleType, completion: @escaping ([HKQuantitySample]?, Error?) -> Void) {
+        
+        let today = Date()
+        guard let aMonthAgo = Calendar.current.date(byAdding: .month, value: -1, to: today) else {
+            print("The universe was created less than a month ago.")
+            return
+        }
+        
+        let predicate = HKQuery.predicateForSamples(withStart: aMonthAgo, end: today, options: .strictStartDate)
+        let mostRecentSortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
+        let sampleQuery = HKSampleQuery(sampleType: type, predicate: predicate, limit: 0, sortDescriptors: [mostRecentSortDescriptor]) { (query, result, error) in
+            
+            DispatchQueue.main.async {
+                guard let samples = result as? [HKQuantitySample] else {
+                    completion(nil, error)
+                    return
+                }
+                completion(samples, nil)
+            }
+        }
+        
+        healthStore.execute(sampleQuery)
+    }
+```
+
+- How is this different from the previous function for querying a single data point? Try to spot the differences!
+
+#### 2. Create varaibles `averageSteps`, `averageDistance`, `averageFlights` and Update `updateUI()`
+
+Add the following code:
+
+``` swift
+    private var averageSteps: Int? {
+        didSet {
+            updateUI()
+        }
+    }
+    
+    private var averageDistance: Double? {
+        didSet {
+            updateUI()
+        }
+    }
+    
+    private var averageFlights: Int? {
+        didSet {
+            updateUI()
+        }
+    }
+```
+
+- Similar to our other varaibles, everytime they're set, we update the UI accordingly.
+
+Don't forget to also update our UpdateUI() function to set the labels:
+
+``` swift
+    private func updateUI() {
+        
+        DispatchQueue.main.async {
+            ...
+            ...
+            if let averageSteps = self.averageSteps {
+                self.averageStepsLabel.text = String(averageSteps)
+            } else {
+                self.averageStepsLabel.text = "Unknown"
+            }
+            if let averageDistance = self.averageDistance {
+                self.averageDistanceLabel.text = String(averageDistance)
+            } else {
+                self.averageDistanceLabel.text = "Unknown"
+            }
+            if let averageFlights = self.averageFlights {
+                self.averageFlightsLabel.text = String(averageFlights)
+            } else {
+                self.averageFlightsLabel.text = "Unknwon"
+            }
+        }
+    }
+```
+
+#### 3. Create the function `readActivitiesData()`
+
+And of course, we'll need a function to read the datas and compute their averages. Add the following function:
+
+``` swift
+    private func readActivitiesData() {
+        
+        guard let stepType = HKSampleType.quantityType(forIdentifier: .stepCount),
+              let distanceType = HKSampleType.quantityType(forIdentifier: .distanceWalkingRunning),
+              let flightType = HKSampleType.quantityType(forIdentifier: .flightsClimbed) else {
+                
+                print("Something horrible has happened.")
+                return
+        }
+        HealthKitController.sharedInstance.readPastMonthSamples(for: stepType) { (samples, error) in
+            if let samples = samples, samples.count > 0 {
+                
+                // This is called a map-reduce operation where we apply a map to every element of a collection and then reduce them into a single value.
+                let samplesInt = samples.map {Int($0.quantity.doubleValue(for: HKUnit.count()))}
+                let sampleSum = samplesInt.reduce(0, {$0 + $1})
+                
+                // Once we have the sum from map-reduce, we can calculate the average.
+                self.averageSteps = sampleSum/30
+            }
+        }
+        HealthKitController.sharedInstance.readPastMonthSamples(for: distanceType) { (samples, error) in
+            if let samples = samples, samples.count > 0 {
+                
+                let samplesDouble = samples.map {$0.quantity.doubleValue(for: HKUnit.mile())}
+                let sampleSum = samplesDouble.reduce(0, {$0 + $1})
+                self.averageDistance = sampleSum/30.0
+            }
+        }
+        HealthKitController.sharedInstance.readPastMonthSamples(for: flightType) { (samples, error) in
+            if let samples = samples, samples.count > 0 {
+                
+                let samplesInt = samples.map {Int($0.quantity.doubleValue(for: HKUnit.count()))}
+                let sampleSum = samplesInt.reduce(0, {$0 + $1})
+                self.averageFlights = sampleSum/30
+            }
+        }
+    }
+```
+
+- This function is pretty similar to our `readWeightAndHeight()` function. The main difference is that in each completion handler, we take the collection of data points, `samples`, and apply map-reduce to compute its average.
+
+Lastly, don't forget to actually call this function! Update `askForHealthKitAccess()` to add `readActivitiesData()` to the `else` clause:
+
+``` swift
+    private func askForHealthKitAccess() {
+        
+        HealthKitController.sharedInstance.authorizeHealthKit { (sucess, error) in
+            if !sucess, let error = error {
+                self.showAlert(title: "HealthKit Authentication Failed", message: error.localizedDescription)
+            } else {
+                self.readWeightAndHeight()
+                self.readActivitiesData()
+            }
+        }
+    }
+```
+
+And that's it! You've finished the whole tutorial. Congratulations, you are now an semi-expert in HealthKit.
+
+---
+
+Thank you so much for reading. - Steven
