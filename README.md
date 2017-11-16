@@ -16,8 +16,8 @@ Note that HealthKit also allow you to directly work with some hardware devices. 
 
 In this demo, we'll use HealthKit to create the following two functionalities:
 
-1) Reading user's height, weight, and monthly steps/distance/flights from `HealthStore`
-2) Writing user's height, weight, and body mass index to `HealthStore`
+1) Reading user's height, weight, and steps/distance/flights from `HealthStore` over different time intervals.
+2) Writing user's height, weight, and body mass index to `HealthStore`.
 
 ### Part I: Interfacing with HealthKit API
 
