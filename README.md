@@ -517,13 +517,15 @@ Now run your app in a simulator or on your iPhone. If you see a "*Health Access*
 
 ### Part III: Calculating Average Activities *(Optional Challenge)*
 
-In this part, we will attempt to read a month of user data of the types `stepCount`, `distanceWalkingRunning`, and `flightsClimbed` from `dataStore`. Then we will calculate the user's daily average steps, daily average distance (in miles), and daily average flights, and update the UI to display their values.
+In this part, we will read three types of user data, walking/running distance, and flights climbed, during the entire past month from `HealthStore`. Then we will calculate the user's daily average steps, daily average distance (in miles), and daily average flights, and update the UI to display their values.
 
-Try to do this by yourself first, then look at my solution below:
+Try to do this by yourself first! Then, once you've made a fair attempt, take a look at the solution below:
 
 #### 1. Create the function `readPastMonthSamples()` in `HealthKitController`
 
-Since we're querying a collection of data points over a long interval of time, we can no longer use our `readMostRecentSample()` function. Add the following codes to our `HealthKitController` class:
+Since we're querying a collection of data points over a long interval of time, we can no longer use our `readMostRecentSample()` function. 
+
+Add the following codes to our `HealthKitController` class:
 
 ``` swift
     func readPastMonthSamples(for type: HKSampleType, completion: @escaping ([HKQuantitySample]?, Error?) -> Void) {
@@ -555,7 +557,7 @@ Since we're querying a collection of data points over a long interval of time, w
 
 #### 2. Create varaibles `averageSteps`, `averageDistance`, `averageFlights` and Update `updateUI()`
 
-Add the following code:
+Add the following code to our `HealthKitController` class:
 
 ``` swift
     private var averageSteps: Int? {
@@ -576,8 +578,6 @@ Add the following code:
         }
     }
 ```
-
-- Similar to our other varaibles, everytime they're set, we update the UI accordingly.
 
 Don't forget to also update our UpdateUI() function to set the labels:
 
@@ -608,7 +608,9 @@ Don't forget to also update our UpdateUI() function to set the labels:
 
 #### 3. Create the function `readActivitiesData()`
 
-And of course, we'll need a function to read the datas and compute their averages. Add the following function:
+And of course, we'll need a function to read the actual data and compute their averages.
+
+Add the following function to our `HealthKitController` class:
 
 ``` swift
     private func readActivitiesData() {
@@ -650,9 +652,11 @@ And of course, we'll need a function to read the datas and compute their average
     }
 ```
 
-- This function is pretty similar to our `readWeightAndHeight()` function. The main difference is that in each completion handler, we take the collection of data points, `samples`, and apply map-reduce to compute its average.
+- This function is pretty similar to `readWeightAndHeight()`. The main difference is that in each completion handler, we take the collection of data points (`samples`) and apply map-reduce to compute its average.
 
-Lastly, don't forget to actually call this function! Update `askForHealthKitAccess()` to add `readActivitiesData()` to the `else` clause:
+Lastly, don't forget to actually call the function! 
+
+Update `askForHealthKitAccess()` to add `readActivitiesData()` to the `else` clause:
 
 ``` swift
     private func askForHealthKitAccess() {
@@ -668,7 +672,9 @@ Lastly, don't forget to actually call this function! Update `askForHealthKitAcce
     }
 ```
 
-And that's it! You've finished the whole tutorial. Congratulations, you are now an semi-expert in HealthKit.
+And that's it! You've finished the whole tutorial. Congratulations, you are now a semi-expert in HealthKit.
+
+You're welcome to check out the completed version of the project in the branch `complete_project`.
 
 ---
 
