@@ -14,12 +14,13 @@ Note that HealthKit also allow you to directly work with some hardware devices. 
 
 ## CocoaHealth: a Demo App
 
-In this demo, we'll use HealthKit to create the following two functionalities:
+To get started, download the starter project in this repository by clicking on "*Clone or download*" on the top of the page and then "*Download ZIP*".
 
-1) Reading user's height, weight, and steps/distance/flights from `HealthStore` over different time intervals.
-2) Writing user's height, weight, and body mass index to `HealthStore`.
+Once you have the folder downloaded and unzipped, go ahead and open "***CocoaHealth-Starter.xcodeproj***". Then the first thing you wanna do is team signing, as you would do in any project. If you have trouble signing your team, please raise your hand, and we'll come around to help you.
 
 ### Part I: Interfacing with HealthKit API
+
+1. 
 
 ```swift
 import HealthKit
