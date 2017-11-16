@@ -391,7 +391,7 @@ Now that we have the appropriate values and functions, let's update our IBAction
 
 Let's call `readWeightAndHeight()` in that `else` clause in the `askForHealthKitAccess()` function so that right after authorization, we begin loading the data. Update the following code:
 
-```
+``` swift
     private func askForHealthKitAccess() {
         
         HealthKitController.sharedInstance.authorizeHealthKit { (sucess, error) in
@@ -466,7 +466,7 @@ The time has come! Let's fill in those `didSet` observers of our private varaibl
 
 - Now, everytime the `weight` or `height` is set, we recalculate `bodyMassIndex`. And everytime `bodyMassIndex` is set, we update the UI to display it to the user.
 
-Also, don't forget to add `updateUI()` to the end of our `readWeightAndHeight()` function, so that once we've fetched user's data from `HealthStore` we can display them to the user:
+Don't forget to also add `updateUI()` to the end of our `readWeightAndHeight()` function, so that once we've fetched user's data from `HealthStore` we can display them to the user:
 
 ``` swift
     private func readWeightAndHeight() {
@@ -511,8 +511,8 @@ Don't forget to also actually set the delegates! Update `viewDidLoad()` with the
     }
 ```
 
-Good job!
+Good job! 
 
-Now run your app in a simulator or on your iPhone!
+Now run your app in a simulator or on your iPhone. If you see a "*Health Access*" page pop up, click on "*Turn All Categories On*" and then "*Allow*". Walala. You've created a functional app with HealthKit support! Play around with it and once you feel ready, try out part 3!
 
-### Part III: Calculating Average Activities *(Optional)*
+### Part III: Calculating Average Activities *(Optional Challenge)*
