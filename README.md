@@ -8,17 +8,44 @@ This is a [CocoaNuts](https://sites.google.com/site/cocoanutsios/home) demo deve
 
 <img src="https://cdn.macrumors.com/article-new/2014/09/healthkit-logo.png" width="200"/>
 
-It is a simple framework for managing health-related data across apps on iPhone and Apple Watch. If you are developing a health & fitness app, HealthKit allows you to accesss, store, and share various types of user data like weight, blood pressure, steps, or workout informations in an encrpted database called `HealthStore`
+It is a simple framework for managing health-related data across apps on iPhone and Apple Watch. If you are developing a health & fitness app, HealthKit allows you to accesss, store, and share various types of user data like weight, blood pressure, steps, or workout informations in an encrpted database called `HealthStore`.
 
 Note that HealthKit also allow you to directly work with some hardware devices. For example, "*in iOS 8.0, the system can automatically save data from compatible Bluetooth LE heart rate monitors.*" (from Apple)
 
 ## CocoaHealth: a Demo App
 
+### Introduction
+
+In this demo app, you will learn the basics of HealthKit querying and storing. 
+
+The app, once finished, will have two functionalities:
+
+1) *Read user's height and weight from `HealthStore` or have user input it, calculate his or her body mass index, and store them back into `HealthStore`.*
+2) *Read user's steps, walking distance, and flights climbed during the past month, then calculate his or her daily average activities.*
+
+And it will look something like this:
+
+<img src="https://github.com/sstevenshang/HealthKit-Demo/blob/master/screenshot_3.png" width="275"/> <img src="https://github.com/sstevenshang/HealthKit-Demo/blob/master/screenshot_1.png" width="275"/> <img src="https://github.com/sstevenshang/HealthKit-Demo/blob/master/screenshot_2.png" width="275"/>
+
+### Getting Started
+
+To avoid wasting too much time on UI/storyboard setup, I've prepared a starter project for you. In it, I've set up the minimal UI elements in stoyboard and connected them to IBOutlets and IBActions. So unless you *want* to tweak the design, you don't need to touch `Main.storyboard` once during this entire tutorial.
+
 To get started, download the starter project in this repository by clicking on "*Clone or download*" on the top of the page and then "*Download ZIP*".
 
-Once you have the folder downloaded and unzipped, go ahead and open "***CocoaHealth-Starter.xcodeproj***". Then the first thing you wanna do is team signing, as you would do in any project. If you have trouble signing your team, please raise your hand, and we'll come around to help you.
+Once you have the folder downloaded and unzipped, go ahead and open "*CocoaHealth-Starter.xcodeproj*". Then the first thing you wanna do is team signing, as you would do in any project. ***Go to the Project Navigator and selection a team under "General".*** (If you have trouble signing a team, please raise your hand, and we'll come around to help you.)
+
+Then, you wanna ***click on "Capacities" and toggle the option that says "HealthKit".*** This will create the entitlements you need to be able to use framework.
+
+![toggling-101](https://koenig-media.raywenderlich.com/uploads/2017/06/UpdatedCapabilities.png)
+
+There, now you're all set to begin exploring HealthKit!
 
 ### Part I: Interfacing with HealthKit API
+
+First, we will be implementing some generic read/write functions to interface with the HealKit API. Not only will it make our life a lot easier later on, this step is the absolute core of this demo! Once you've learned how to interface with the API, you can basically do anything you want with HealthKit and become ready to disrupt the healthcare industry.
+
+Let's start by 
 
 1. 
 
