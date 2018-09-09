@@ -9,16 +9,13 @@
 import UIKit
 import HealthKit
 
-class ViewController: UIViewController {
+class BMIViewController: UIViewController {
 
     @IBOutlet weak var weightTextField: UITextField!
     @IBOutlet weak var heightTextField: UITextField!
     @IBOutlet weak var bodyMassIndexLabel: UILabel!
     @IBOutlet weak var saveButton: UIButton!
-    @IBOutlet weak var averageStepsLabel: UILabel!
-    @IBOutlet weak var averageDistanceLabel: UILabel!
-    @IBOutlet weak var averageFlightsLabel: UILabel!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -57,7 +54,6 @@ class ViewController: UIViewController {
                 self.showAlert(title: "HealthKit Authentication Failed", message: error.localizedDescription)
             } else {
                 self.readWeightAndHeight()
-                self.readActivitiesData()
             }
         }
     }
@@ -169,21 +165,6 @@ class ViewController: UIViewController {
             } else {
                 self.bodyMassIndexLabel.text = "Unknown"
             }
-            if let averageSteps = self.averageSteps {
-                self.averageStepsLabel.text = String(averageSteps)
-            } else {
-                self.averageStepsLabel.text = "Unknown"
-            }
-            if let averageDistance = self.averageDistance {
-                self.averageDistanceLabel.text = String(averageDistance)
-            } else {
-                self.averageDistanceLabel.text = "Unknown"
-            }
-            if let averageFlights = self.averageFlights {
-                self.averageFlightsLabel.text = String(averageFlights)
-            } else {
-                self.averageFlightsLabel.text = "Unknwon"
-            }
         }
     }
     
@@ -198,67 +179,13 @@ class ViewController: UIViewController {
         bodyMassIndex = weightInKiloG/(heightInMeter * heightInMeter)
     }
     
-    private var averageSteps: Int? {
-        didSet {
-            updateUI()
-        }
-    }
-    
-    private var averageDistance: Double? {
-        didSet {
-            updateUI()
-        }
-    }
-    
-    private var averageFlights: Int? {
-        didSet {
-            updateUI()
-        }
-    }
-    
-    private func readActivitiesData() {
-        
-        guard let stepType = HKSampleType.quantityType(forIdentifier: .stepCount),
-            let distanceType = HKSampleType.quantityType(forIdentifier: .distanceWalkingRunning),
-            let flightType = HKSampleType.quantityType(forIdentifier: .flightsClimbed) else {
-                
-                print("Something horrible has happened.")
-                return
-        }
-        HealthKitController.sharedInstance.readPastMonthSamples(for: stepType) { (samples, error) in
-            if let samples = samples, samples.count > 0 {
-                
-                // This is called a MapReduce operation where we apply a map to every element of a collection and then reduce them into a single value.
-                let samplesInt = samples.map {Int($0.quantity.doubleValue(for: HKUnit.count()))}
-                let sampleSum = samplesInt.reduce(0, {$0 + $1})
-                
-                // Once we have the sum from MapReduce, we can calculate the average.
-                self.averageSteps = sampleSum/30
-            }
-        }
-        HealthKitController.sharedInstance.readPastMonthSamples(for: distanceType) { (samples, error) in
-            if let samples = samples, samples.count > 0 {
-                
-                let samplesDouble = samples.map {$0.quantity.doubleValue(for: HKUnit.mile())}
-                let sampleSum = samplesDouble.reduce(0, {$0 + $1})
-                self.averageDistance = sampleSum/30.0
-            }
-        }
-        HealthKitController.sharedInstance.readPastMonthSamples(for: flightType) { (samples, error) in
-            if let samples = samples, samples.count > 0 {
-                
-                let samplesInt = samples.map {Int($0.quantity.doubleValue(for: HKUnit.count()))}
-                let sampleSum = samplesInt.reduce(0, {$0 + $1})
-                self.averageFlights = sampleSum/30
-            }
-        }
-    }
 }
 
-extension ViewController: UITextFieldDelegate {
+extension BMIViewController: UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
     }
+
 }

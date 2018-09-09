@@ -8,10 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		B5935AAC1FBD29B200E329D8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5935AAB1FBD29B200E329D8 /* AppDelegate.swift */; };
-		B5935AAE1FBD29B200E329D8 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5935AAD1FBD29B200E329D8 /* ViewController.swift */; };
+		B5935AAE1FBD29B200E329D8 /* BMIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5935AAD1FBD29B200E329D8 /* BMIViewController.swift */; };
 		B5935AB11FBD29B200E329D8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5935AAF1FBD29B200E329D8 /* Main.storyboard */; };
 		B5935AB31FBD29B200E329D8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5935AB21FBD29B200E329D8 /* Assets.xcassets */; };
 		B5935AB61FBD29B200E329D8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5935AB41FBD29B200E329D8 /* LaunchScreen.storyboard */; };
+		B5D23D9E2144BA5500F0D3EE /* PageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D23D9D2144BA5500F0D3EE /* PageViewController.swift */; };
+		B5D23DA02144C58D00F0D3EE /* ActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D23D9F2144C58D00F0D3EE /* ActivityViewController.swift */; };
 		B5E40F381FBD6A34001F986A /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5E40F371FBD6A34001F986A /* HealthKit.framework */; };
 		B5E40F3A1FBD6A90001F986A /* HealthKitController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E40F391FBD6A90001F986A /* HealthKitController.swift */; };
 /* End PBXBuildFile section */
@@ -19,11 +21,13 @@
 /* Begin PBXFileReference section */
 		B5935AA81FBD29B200E329D8 /* CocoaHealth-Starter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CocoaHealth-Starter.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5935AAB1FBD29B200E329D8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		B5935AAD1FBD29B200E329D8 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		B5935AAD1FBD29B200E329D8 /* BMIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BMIViewController.swift; sourceTree = "<group>"; };
 		B5935AB01FBD29B200E329D8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B5935AB21FBD29B200E329D8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B5935AB51FBD29B200E329D8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B5935AB71FBD29B200E329D8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B5D23D9D2144BA5500F0D3EE /* PageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageViewController.swift; sourceTree = "<group>"; };
+		B5D23D9F2144C58D00F0D3EE /* ActivityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityViewController.swift; sourceTree = "<group>"; };
 		B5E40F351FBD6A34001F986A /* CocoaHealth-Starter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "CocoaHealth-Starter.entitlements"; sourceTree = "<group>"; };
 		B5E40F371FBD6A34001F986A /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		B5E40F391FBD6A90001F986A /* HealthKitController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitController.swift; sourceTree = "<group>"; };
@@ -63,14 +67,32 @@
 			children = (
 				B5E40F351FBD6A34001F986A /* CocoaHealth-Starter.entitlements */,
 				B5935AAB1FBD29B200E329D8 /* AppDelegate.swift */,
-				B5935AAD1FBD29B200E329D8 /* ViewController.swift */,
+				B5D23DA12144C7B700F0D3EE /* UIViewControllers */,
+				B5D23DA22144C7C300F0D3EE /* DataControllers */,
 				B5935AAF1FBD29B200E329D8 /* Main.storyboard */,
 				B5935AB21FBD29B200E329D8 /* Assets.xcassets */,
 				B5935AB41FBD29B200E329D8 /* LaunchScreen.storyboard */,
 				B5935AB71FBD29B200E329D8 /* Info.plist */,
-				B5E40F391FBD6A90001F986A /* HealthKitController.swift */,
 			);
 			path = "CocoaHealth-Starter";
+			sourceTree = "<group>";
+		};
+		B5D23DA12144C7B700F0D3EE /* UIViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				B5D23D9D2144BA5500F0D3EE /* PageViewController.swift */,
+				B5935AAD1FBD29B200E329D8 /* BMIViewController.swift */,
+				B5D23D9F2144C58D00F0D3EE /* ActivityViewController.swift */,
+			);
+			path = UIViewControllers;
+			sourceTree = "<group>";
+		};
+		B5D23DA22144C7C300F0D3EE /* DataControllers */ = {
+			isa = PBXGroup;
+			children = (
+				B5E40F391FBD6A90001F986A /* HealthKitController.swift */,
+			);
+			path = DataControllers;
 			sourceTree = "<group>";
 		};
 		B5E40F361FBD6A34001F986A /* Frameworks */ = {
@@ -158,9 +180,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B5935AAE1FBD29B200E329D8 /* ViewController.swift in Sources */,
+				B5935AAE1FBD29B200E329D8 /* BMIViewController.swift in Sources */,
 				B5935AAC1FBD29B200E329D8 /* AppDelegate.swift in Sources */,
 				B5E40F3A1FBD6A90001F986A /* HealthKitController.swift in Sources */,
+				B5D23DA02144C58D00F0D3EE /* ActivityViewController.swift in Sources */,
+				B5D23D9E2144BA5500F0D3EE /* PageViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
